@@ -458,7 +458,7 @@ void drawWindow(Point a, Point b, Point c, Point d, float lean) {
         glVertex2f(p4.x, p4.y);
     glEnd();
 }
-
+//------Fire in window-------
 void drawFireInWindow(float cx, float cy, float size, float show) {
     if(show <= 0.01f) {
         return;
@@ -506,7 +506,108 @@ void drawFireInWindow(float cx, float cy, float size, float show) {
 
     glPopMatrix();
 }
+//------Help needed human -----
+void drawHelpHumanInWindow6() {
+    float f = fireValue();
 
+    if(f <= 0.02f) {
+        return;
+    }
+
+    float show = limit01(f);
+    float handWave = sin(frameCount * 0.18f) * 0.12f * show;
+
+    // Window 6 boundary: x = 11 to 12, y = 4 to 5
+    GLdouble clipLeft[]   = { 1.0,  0.0, 0.0, -11.0}; // x >= 11
+    GLdouble clipRight[]  = {-1.0,  0.0, 0.0,  12.0}; // x <= 12
+    GLdouble clipBottom[] = { 0.0,  1.0, 0.0,  -4.0}; // y >= 4
+    GLdouble clipTop[]    = { 0.0, -1.0, 0.0,   5.0}; // y <= 5
+
+    glClipPlane(GL_CLIP_PLANE0, clipLeft);
+    glEnable(GL_CLIP_PLANE0);
+
+    glClipPlane(GL_CLIP_PLANE1, clipRight);
+    glEnable(GL_CLIP_PLANE1);
+
+    glClipPlane(GL_CLIP_PLANE2, clipBottom);
+    glEnable(GL_CLIP_PLANE2);
+
+    glClipPlane(GL_CLIP_PLANE3, clipTop);
+    glEnable(GL_CLIP_PLANE3);
+
+    // ---------------- BODY ----------------
+    glColor3f(1.0f, 0.0f, 0.0f);   // red shirt/body
+    glBegin(GL_POLYGON);
+        glVertex2f(11.4946f, 4.39331f);
+        glVertex2f(11.7623f, 4.32168f);
+        glVertex2f(11.7185f, 4.0148f);
+        glVertex2f(11.27318f, 4.00788f);
+        glVertex2f(11.2224f, 4.31014f);
+    glEnd();
+
+    // ---------------- RIGHT HAND (moving) ----------------
+    glColor3f(0.95f, 0.70f, 0.48f);   // skin tone
+    glBegin(GL_TRIANGLES);
+        glVertex2f(11.7623f, 4.32168f);                         // shoulder
+       glVertex2f(11.96f, 4.60779f + handWave);          // moving hand tip
+        glVertex2f(11.7462f, 4.20894f);                        // arm lower point
+    glEnd();
+
+    // ---------------- LEFT HAND ----------------
+    glBegin(GL_TRIANGLES);
+        glVertex2f(11.03f, 4.6f);         // hand tip
+        glVertex2f(11.2224f, 4.31014f);    // shoulder side
+        glVertex2f(11.2404f, 4.20279f);    // lower point
+    glEnd();
+
+    // ---------------- HEAD ----------------
+    glColor3f(0.95f, 0.70f, 0.48f);   // skin tone head
+    float centerX = 11.48776f;
+    float centerY = 4.57318f;
+    float radius  = 0.18f;
+
+    glBegin(GL_POLYGON);
+    for(int i = 0; i < 360; i++) {
+        float angle = i * 3.1416f / 180.0f;
+        float X = centerX + radius * cos(angle);
+        float Y = centerY + radius * sin(angle);
+        glVertex2f(X, Y);
+    }
+    glEnd();
+
+    // ---------------- HAIR ----------------
+    glColor3f(0.08f, 0.04f, 0.03f);
+    glBegin(GL_POLYGON);
+        glVertex2f(11.34f, 4.60f);
+        glVertex2f(11.63f, 4.60f);
+        glVertex2f(11.59f, 4.73f);
+        glVertex2f(11.39f, 4.73f);
+    glEnd();
+
+    // ---------------- EYES ----------------
+    glColor3f(0.1f, 0.1f, 0.1f);
+    glPointSize(2.0f);
+    glBegin(GL_POINTS);
+        glVertex2f(11.44f, 4.58f);
+        glVertex2f(11.54f, 4.58f);
+    glEnd();
+
+    // ---------------- Disable Clipping ----------------
+    glDisable(GL_CLIP_PLANE0);
+    glDisable(GL_CLIP_PLANE1);
+    glDisable(GL_CLIP_PLANE2);
+    glDisable(GL_CLIP_PLANE3);
+
+    // ---------------- Redraw Window Border ----------------
+    glColor3f(0.20f, 0.35f, 0.45f);
+    glLineWidth(1.8f);
+    glBegin(GL_LINE_LOOP);
+        glVertex2f(11.0f, 4.0f);
+        glVertex2f(11.0f, 5.0f);
+        glVertex2f(12.0f, 5.0f);
+        glVertex2f(12.0f, 4.0f);
+    glEnd();
+}
 void drawBuildings() {
     float q = earthquakeValue();
     float f = fireValue();
@@ -571,7 +672,7 @@ void drawBuildings() {
     drawFireInWindow(9.5f, 6.45f, 0.90f, f);
     drawFireInWindow(11.5f, 6.45f, 0.90f, f);
     drawFireInWindow(9.5f, 4.45f, 0.80f, f);
-    drawFireInWindow(11.5f, 4.45f, 0.80f, f);
+    //drawFireInWindow(11.5f, 4.45f, 0.80f, f);
 }
 
 void drawTree() {
@@ -1428,6 +1529,8 @@ void display() {
     drawRoadCrack();
     draw3DDebrisCube(earthquakeValue());
     drawBuildings();
+    //human help
+    drawHelpHumanInWindow6();
     drawTree();
     drawLamp();
     drawPeople();
