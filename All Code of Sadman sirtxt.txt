@@ -1,0 +1,428 @@
+//M-DOt
+#include <GL/glut.h>
+
+void display() {
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glPointSize(15.0);
+
+    glBegin(GL_POINTS);
+        glColor3f(1,1,0);
+        glVertex2f(0.0, 0.0);
+        glColor3f(0,1,1);
+
+        glVertex2f(0.9, 0.0);
+        glColor3f(1,0,1);
+        glVertex2f(0.9, 0.1);
+
+        //glVertex2f(0.9, 0.9);
+        glEnd();
+
+
+    glFlush();
+}
+
+
+
+int main(int argc, char** argv) {
+
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+
+    glutInitWindowSize(500, 500);
+    glutInitWindowPosition(100, 100);
+
+    glutCreateWindow("Pronoy");
+    //setup();
+    glutDisplayFunc(display);
+
+    glutMainLoop();
+
+    return 0;
+}
+
+//DDA
+#include <GL/glut.h>
+#include <cmath>
+
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    float x1 = 100, y1 = 100;
+    float x2 = 400, y2 = 300;
+
+    float dx = x2 - x1;
+    float dy = y2 - y1;
+
+    float m = dy / dx;
+
+    float x = x1;
+    float y = y1;
+
+    glPointSize(5);
+
+    glBegin(GL_POINTS);
+
+    if (fabs(m) < 1)
+    {
+        while (x <= x2 && y <= y2)
+        {
+            glVertex2i(x, y);
+
+            x = x + 1;
+            y = y + m;
+        }
+    }
+    else
+    {
+        while (y <= y2)
+        {
+            glVertex2i(x, y);
+
+            y = y + 1;
+            x = x + (1/m);
+        }
+    }
+
+    glEnd();
+
+    glFlush();
+}
+
+
+
+
+
+
+
+int main(int argc, char** argv)
+{
+    glutInit(&argc, argv);
+
+    glutInitWindowSize(500,500);
+    glutCreateWindow("DDA slope cases");
+
+       glClearColor(0,0,0,1);
+    glColor3f(1,1,1);
+
+    gluOrtho2D(0,500,0,500);
+
+    glutDisplayFunc(display);
+
+    glutMainLoop();
+
+    return 0;
+}
+//Jump
+#include <GL/glut.h>
+
+float y = 0.0f;
+float v = 0.0f;
+int j = 0;
+
+void display() {
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glLoadIdentity();
+
+
+    glTranslatef(0.0f, y, 0.0f);
+
+    glBegin(GL_QUADS);
+        glColor3f(0, 1, 0);
+        glVertex2f(-0.1, -0.1);
+        glVertex2f( 0.1, -0.1);
+        glVertex2f( 0.1,  0.1);
+        glVertex2f(-0.1,  0.1);
+    glEnd();
+
+    glutSwapBuffers();
+}
+
+void update(int value) {
+
+    if (j) {
+        v -= 0.01f;
+        y += v;
+
+
+        if (y <= 0.0f) {
+            y = 0.0f;
+            v = 0.0f;
+            j = 0;
+        }
+    }
+
+    glutPostRedisplay();
+    glutTimerFunc(16, update, 0);
+}
+
+void keyboard(unsigned char key, int x, int yPos) {
+    if (key == ' ') {
+        if (!j) {
+            j = 1;
+            v = 0.15f;
+        }
+    }
+}
+
+void init() {
+    glClearColor(0, 0, 0, 1);
+}
+
+int main(int argc, char** argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    glutInitWindowSize(500, 500);
+    glutCreateWindow("Jump with Timer");
+
+    init();
+
+    glutDisplayFunc(display);
+    glutKeyboardFunc(keyboard);
+    glutTimerFunc(0, update, 0);
+
+    glutMainLoop();
+    return 0;
+}
+//move 3d
+#include <GL/glut.h>
+
+float angle = 0;
+
+void display() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glLoadIdentity();
+    glTranslatef(0.0f, 0.0f, -6.0f);
+
+    glRotatef(angle, 1.0f, 1.0f, 0.0f);
+
+    /*glBegin(GL_QUADS);
+
+
+    glColor3f(1, 0, 0);
+    glVertex3f(-1, -1,  1);
+    glVertex3f( 1, -1,  1);
+    glVertex3f( 1,  1,  1);
+    glVertex3f(-1,  1,  1);
+
+
+    glColor3f(0, 1, 0);
+    glVertex3f(-1, -1, -1);
+    glVertex3f( 1, -1, -1);
+    glVertex3f( 1,  1, -1);
+    glVertex3f(-1,  1, -1);
+
+
+    glColor3f(0, 0, 1);
+    glVertex3f(-1,  1, -1);
+    glVertex3f( 1,  1, -1);
+    glVertex3f( 1,  1,  1);
+    glVertex3f(-1,  1,  1);
+
+
+    glColor3f(1, 1, 0);
+    glVertex3f(-1, -1, -1);
+    glVertex3f( 1, -1, -1);
+    glVertex3f( 1, -1,  1);
+    glVertex3f(-1, -1,  1);
+
+
+    glColor3f(1, 0, 1);
+    glVertex3f(1, -1, -1);
+    glVertex3f(1,  1, -1);
+    glVertex3f(1,  1,  1);
+    glVertex3f(1, -1,  1);
+
+
+    glColor3f(0, 1, 1);
+    glVertex3f(-1, -1, -1);
+    glVertex3f(-1,  1, -1);
+    glVertex3f(-1,  1,  1);
+    glVertex3f(-1, -1,  1);
+
+    glEnd();
+*/
+
+    glutWireCube(2);
+    glutSwapBuffers();
+}
+
+void update(int value) {
+    angle += 1;
+    glutPostRedisplay();
+    glutTimerFunc(12.5, update, 1);
+}
+
+void init() {
+    glEnable(GL_DEPTH_TEST);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    gluPerspective(60, 1, 1, 10);
+
+    glMatrixMode(GL_MODELVIEW);
+}
+
+int main(int argc, char** argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize(500, 500);
+    glutCreateWindow("Raw Cube");
+
+    init();
+
+    glutDisplayFunc(display);
+    glutTimerFunc(16, update, 0);
+
+    glutMainLoop();
+    return 0;
+}
+//projection 3d
+#include <GL/glut.h>
+
+void display() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(60, 1, 1, 10);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glTranslatef(0, 0, -6);
+    glRotatef(150, 1, 1, 0);
+
+
+    glBegin(GL_QUADS);
+
+
+    glColor3f(1, 0, 0);
+    glVertex3f(-0.5, -0.5, 0.5);
+    glVertex3f( 0.5, -0.5, 0.5);
+    glVertex3f( 0.5,  0.5, 0.5);
+    glVertex3f(-0.5,  0.5, 0.5);
+
+
+    glColor3f(0, 1, 0);
+    glVertex3f(-0.5, -0.5, -0.5);
+    glVertex3f(-0.5,  0.5, -0.5);
+    glVertex3f( 0.5,  0.5, -0.5);
+    glVertex3f( 0.5, -0.5, -0.5);
+
+
+    glColor3f(0, 0, 1);
+    glVertex3f(-0.5, -0.5, -0.5);
+    glVertex3f(-0.5, -0.5,  0.5);
+    glVertex3f(-0.5,  0.5,  0.5);
+    glVertex3f(-0.5,  0.5, -0.5);
+
+
+    glColor3f(1, 1, 0);
+    glVertex3f(0.5, -0.5, -0.5);
+    glVertex3f(0.5,  0.5, -0.5);
+    glVertex3f(0.5,  0.5,  0.5);
+    glVertex3f(0.5, -0.5,  0.5);
+
+
+    glColor3f(0, 1, 1);
+    glVertex3f(-0.5, 0.5, -0.5);
+    glVertex3f(-0.5, 0.5,  0.5);
+    glVertex3f( 0.5, 0.5,  0.5);
+    glVertex3f( 0.5, 0.5, -0.5);
+
+
+    glColor3f(1, 0, 1);
+    glVertex3f(-0.5, -0.5, -0.5);
+    glVertex3f( 0.5, -0.5, -0.5);
+    glVertex3f( 0.5, -0.5,  0.5);
+    glVertex3f(-0.5, -0.5,  0.5);
+
+    glEnd();
+
+    glFlush();
+}
+
+int main(int argc, char** argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize(500, 500);
+    glutCreateWindow("3D Color Cube");
+
+    glEnable(GL_DEPTH_TEST);
+
+    glutDisplayFunc(display);
+    glutMainLoop();
+    return 0;
+}
+
+//transformation
+#include <GL/glut.h>
+
+float tx = 0.0f, ty = 0.0f;
+float sx = 1.0f, sy = 1.0f;
+float angle = 0.0f;
+
+void display() {
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    glTranslatef(tx, ty, 0.0f);
+    glRotatef(angle, 0.0f, 0.0f, 1.0f);
+    glScalef(sx, sy, 1.0f);
+
+    glBegin(GL_TRIANGLES);
+        glColor3f(1.0, 0.0, 0.0);
+        glVertex2f(0.0, 0.5);
+
+        glColor3f(0.0, 1.0, 0.0);
+        glVertex2f(-0.5, -0.5);
+
+        glColor3f(0.0, 0.0, 1.0);
+        glVertex2f(0.5, -0.5);
+    glEnd();
+
+    glFlush();
+}
+
+void keyboard(unsigned char key, int x, int y) {
+    switch(key) {
+        case 'w': ty += 0.1f; break;
+        case 's': ty -= 0.1f; break;
+        case 'a': tx -= 0.1f; break;
+        case 'd': tx += 0.1f; break;
+        case '+': sx += 0.1f; sy += 0.1f; break;
+        case '-': sx -= 0.1f; sy -= 0.1f; break;
+        case 'r': angle += 5.0f; break;
+        case 'R': angle -= 5.0f; break;
+        case 'x': exit(0);
+    }
+    glutPostRedisplay();
+}
+
+void init() {
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(-1, 1, -1, 1);
+}
+
+int main(int argc, char** argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+    glutInitWindowSize(600, 600);
+    glutCreateWindow("2D Transformations");
+
+    init();
+    glutDisplayFunc(display);
+    glutKeyboardFunc(keyboard);
+
+    glutMainLoop();
+    return 0;
+}
